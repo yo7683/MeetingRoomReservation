@@ -1,6 +1,22 @@
+/*************************************************************
+ * @author : th.kim
+ * @date : 2023-09-01
+ * @group :
+ * @group-content :
+ * @description : 회의실 예약 시스템 Controller
+==============================================================
+ * Ver          Date             Author         Modification
+   1.0          2023-09-01       th.kim         Initial Version
+**************************************************************/
+
 public with sharing class ST_MeetingRoomController {
 
-    // 모든 시간 가져오는 메서드
+    /**
+     * @author th.kim
+     * @description 회의실 모든 시간 데이터 가져오기
+     *
+     * @return returnMap
+     */
     @AuraEnabled
     public static Map<String,List<String>> getTime() {
         List<MeetingTime__c> mtList = [SELECT Id, StartTime__c, EndTime__c FROM MeetingTime__c];
@@ -14,13 +30,19 @@ public with sharing class ST_MeetingRoomController {
             startTimeList.add(String.valueOf(startHours).leftPad(2, '0') + ':' + String.valueOf(startMinutes).leftPad(2, '0'));
             endTimeList.add(String.valueOf(endHours).leftPad(2, '0') + ':' + String.valueOf(endMinutes).leftPad(2, '0'));
         }
-        Map<String,List<String>> returnMap = new Map<String,List<String>>();
-        returnMap.put('startTimeList', startTimeList);
-        returnMap.put('endTimeList', endTimeList);
+        Map<String,List<String>> returnMap = new Map<String,List<String>>{
+                'startTimeList' => startTimeList,
+                'endTimeList' => endTimeList
+        };
         return returnMap;
     }
 
-    // 예약된 회의실 리스트 가져오는 메서드
+    /**
+     * @author th.kim
+     * @description 예약된 회의실 리스트 가져오기
+     *
+     * @return rmList
+     */
     @AuraEnabled
     public static List<ReserveMeetingRoom__c> getReserved(){
         try {
@@ -35,7 +57,14 @@ public with sharing class ST_MeetingRoomController {
         }
     }
 
-    // 회의실 예약 메서드
+    /**
+     * @author th.kim
+     * @description 회의실 예약 메서드
+     * @param selectedData 예약하기 위해 선택한 데이터
+     * @param allTimeData 시작 시간 ~ 종료 시간의 데이터
+     *
+     * @return returnValue
+     */
     @AuraEnabled
     public static String doReserve(Map<String,String> selectedData, String allTimeData){
         String returnValue;
@@ -86,7 +115,12 @@ public with sharing class ST_MeetingRoomController {
         return returnValue;
     }
 
-    // 나의 예약 정보 가져오는 메서드
+    /**
+     * @author th.kim
+     * @description 나의 예약 정보 가져오기
+     *
+     * @return rmList
+     */
     @AuraEnabled
     public static List<ReserveMeetingRoom__c> getMyReserve(){
         try {
@@ -105,7 +139,13 @@ public with sharing class ST_MeetingRoomController {
         }
     }
 
-    // 예약 내역 지우는 메서드
+    /**
+     * @author th.kim
+     * @description 예약 내역 삭제
+     * @param delRecordId 삭제할 Record Id
+     *
+     * @return 삭제 성공 : 'S', 삭제 실패 : 'F'
+     */
     @AuraEnabled
     public static String deleteReserve(String delRecordId){
         try {
@@ -118,6 +158,7 @@ public with sharing class ST_MeetingRoomController {
         }
     }
 
+    // 이거 굳이 필요 없을듯 이미 배열이 있는데 굳이 여기서 새로운 배열 뽑아올 필요 없음 다음에 수정 ㄱㄱ
     @AuraEnabled
     public static ReserveMeetingRoom__c getDeleteRecord(String delRecordId){
         try {
