@@ -1,0 +1,221 @@
+<template>
+    <lightning-tabset>
+        <lightning-tab label="회의실 예약">
+            <section class="reserve">
+                <template for:each={reserveList} for:item="date">
+                    <div key={date.value} class="slds-text-align_center slds-m-bottom_medium">
+                        <div class="slds-text-title_bold slds-text-heading_medium slds-p-around_small">{date.label}</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="slds-size_1-of-7">회의실</th>
+                                    <th colspan="2">08:00</th>
+                                    <th colspan="2">09:00</th>
+                                    <th colspan="2">10:00</th>
+                                    <th colspan="2">11:00</th>
+                                    <th colspan="2">12:00</th>
+                                    <th colspan="2">13:00</th>
+                                    <th colspan="2">14:00</th>
+                                    <th colspan="2">15:00</th>
+                                    <th colspan="2">16:00</th>
+                                    <th colspan="2">17:00</th>
+                                    <th colspan="2">18:00</th>
+                                    <th colspan="2">19:00</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={date.room} for:item="room">
+                                    <tr key={room.value} class="slds-wrap">
+                                        <th class="slds-size_1-of-7">{room.value}</th>
+                                        <template for:each={room.time} for:item="time" for:index="index">
+                                            <td key={time.id} class="btn-box">
+                                                <template if:false={time.isReserved}>
+                                                    <template if:false={time.isSelected}>
+                                                        <button class="non-selected" data-index={time.index} data-id={time.id} data-date={date.value} data-room={room.value} data-starttime={time.startTime} data-endtime={time.endTime} onclick={onTimeClick}></button>
+                                                    </template>
+                                                    <template if:true={time.isSelected}>
+                                                        <button class="selected" data-index={time.index} data-id={time.id} data-date={date.value} data-room={room.value} data-starttime={time.startTime} data-endtime={time.endTime} onclick={onTimeClick}></button>
+                                                    </template>
+                                                </template>
+                                                <template if:true={time.isReserved}>
+                                                    <button class={time.color} data-index={time.index} data-id={time.id} data-date={date.value} data-room={room.value} data-starttime={time.startTime} data-endtime={time.endTime} onclick={onTimeClick} disabled></button>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+            </section>
+        </lightning-tab>
+        <lightning-tab label="내 예약">
+            <section class="my-reserve">
+                <template if:true={myData}>
+                    <button class="slds-button slds-button_destructive slds-float_right slds-m-bottom_x-small" onclick={onCancelReserved}>예약 취소</button>
+                </template>
+                <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid" aria-label="Example advanced table as radio group">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-align_right" scope="col" style="width:3.25rem">
+                                <div class="slds-truncate slds-assistive-text" id="column-group-header" title="Choose a row to select">Choose a row to select</div>
+                            </th>
+                            <th class="slds-p-around_medium" scope="col">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title='예약 날짜'>예약 날짜</span>
+                                </div>
+                            </th>
+                            <th class="slds-p-around_medium" scope="col">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title='예약 시작 시간'>예약 시작 시간</span>
+                                </div>
+                            </th>
+                            <th class="slds-p-around_medium" scope="col">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title='예약 종료 시간'>예약 종료 시간</span>
+                                </div>
+                            </th>
+                            <th class="slds-p-around_medium" scope="col">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title='회의실'>회의실</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template if:true={myData}>
+                            <template for:each={myData} for:item="data">
+                                <tr key={data.Id} class="slds-hint-parent">
+                                    <td class="slds-text-align_right" role="gridcell">
+                                    <span class="slds-radio">
+                                        <input type="radio" id={data.Id} value={data.Id} name="options" onchange={onRadioChange}/>
+                                        <label class="slds-radio__label" for={data.Id} id="radio-button-label-01">
+                                        <span class="slds-radio_faux"></span>
+                                        <span class="slds-form-element__label slds-assistive-text">Select item 1</span>
+                                        </label>
+                                    </span>
+                                    </td>
+                                    <td role="gridcell">
+                                        <div class="slds-truncate" title={data.MeetingDate__c}>{data.MeetingDate__c}</div>
+                                    </td>
+                                    <td role="gridcell">
+                                        <div class="slds-truncate" title={data.StartTime__c}>{data.StartTime__c}</div>
+                                    </td>
+                                    <td role="gridcell">
+                                        <div class="slds-truncate" title={data.EndTime__c}>{data.EndTime__c}</div>
+                                    </td>
+                                    <td role="gridcell">
+                                        <div class="slds-truncate" title={data.RoomName__c}>{data.RoomName__c}</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+                        <template if:false={myData}>
+                            <tr class="slds-size_1-of-1">
+                                <td class="slds-size_1-of-1 empty" colspan="5">예약된 회의실이 업슴</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </section>
+        </lightning-tab>
+    </lightning-tabset>
+
+    <!-- 모달 창 -->
+    <template if:true={isShowModal}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" style="font-weight: bold;">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={onCloseModalClick}>
+                    <lightning-icon icon-name="utility:close"
+                        alternative-text="close"
+                        variant="inverse"
+                        size="small">
+                    </lightning-icon>
+                    <div class="slds-assistive-text">Close</div>
+                </button>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">회의실 예약</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    날짜 : {selectedData.date}
+                    <br>
+                    회의실 : {selectedData.room}
+                    <br>
+                    시간 : {selectedData.startTime} ~ {selectedData.endTime}
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={onCloseModalClick}>취소</button>
+                    <button class="slds-button slds-button_brand" onclick={onReserveClick}>예약</button>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+    <template if:true={isCancelReserveChkModal}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" style="font-weight: bold;">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={onCloseModalClick}>
+                    <lightning-icon icon-name="utility:close"
+                        alternative-text="close"
+                        variant="inverse"
+                        size="small">
+                    </lightning-icon>
+                    <div class="slds-assistive-text">Close</div>
+                </button>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">예약을 취소하시겠습니까 ?</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium slds-text-align_center" id="modal-content-id-2">
+                    <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="slds-p-around_medium" scope="col">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                        <span class="slds-truncate" title='예약 날짜'>예약 날짜</span>
+                                    </div>
+                                </th>
+                                <th class="slds-p-around_medium" scope="col">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                        <span class="slds-truncate" title='예약 시작 시간'>예약 시작 시간</span>
+                                    </div>
+                                </th>
+                                <th class="slds-p-around_medium" scope="col">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                        <span class="slds-truncate" title='예약 종료 시간'>예약 종료 시간</span>
+                                    </div>
+                                </th>
+                                <th class="slds-p-around_medium" scope="col">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                        <span class="slds-truncate" title='회의실'>회의실</span>
+                                    </div>
+                                </th>
+                                </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="slds-hint-parent">
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title={delRecord.MeetingDate__c}>{delRecord.MeetingDate__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title={delRecord.StartTime__c}>{delRecord.StartTime__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title={delRecord.EndTime__c}>{delRecord.EndTime__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title={delRecord.RoomName__c}>{delRecord.RoomName__c}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={onCloseModalClick}>아니오</button>
+                    <button class="slds-button slds-button_destructive" onclick={onDeleteReserve}>예약 취소</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>
